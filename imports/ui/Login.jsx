@@ -5,17 +5,18 @@ import {
 	Box,
 	Button,
 	Typography,
-	Input,
 	TextField,
 	FormHelperText,
 	Alert
 } from '@mui/material';
+import { Redirect } from "react-router-dom";
 
 /*   Componente Login: Contém a página de login
   State:
 	username: usuário inserido
 	password: senha inserida
 	alert: mensagens de alertar
+	isLogged: após o login, redireciona a pagina principal
   Funções:
     handleSubmit: realiza a tentativa de login
  */
@@ -23,7 +24,7 @@ export const Login = () =>{
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [alert, setAlert] = useState({state:false,message:''})
-	let isLogged = false;
+	const [isLogged, setLogged] = useState(false);
 	const history = useHistory();
 	if(isLogged){
 		
@@ -35,19 +36,16 @@ export const Login = () =>{
 		Meteor.loginWithPassword(username, password, function(error) {
 			if(error){
 				setAlert({state: true, message: `${error}`})
-				isLogged = false;
+				
 				return;
 			} else {
-				isLogged = true;
+				setLogged(true);
 			}
 		});
+	}
 
-		//Definitivamente não é a melhor forma de fazer isso
-		Meteor.setTimeout(() => {
-			if(isLogged){
-				history.push('/main');
-			}
-		}, 800);
+	if(isLogged){
+		return <Redirect to={{pathname:'/main'}} />;
 	}
 
    return (
