@@ -23,20 +23,7 @@ import { Backdrop, CircularProgress } from "@mui/material";
   Componente principal
   Contém as rotas públicas e privadas (PrivateRoute)
 */
-export const Appcomponent = ({ user }) => {
-  let isLogged = user? true : false
-  
-  if(user === undefined){
-    return (
-      <>
-        <Header />
-        <Backdrop 
-          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={true}>
-          <CircularProgress />
-        </Backdrop></>
-    )
-  }
+export const Appcomponent = ({ userId }) => {
   return (
     <Router>
     <Header/>
@@ -44,9 +31,9 @@ export const Appcomponent = ({ user }) => {
           <Route exact path="/" component={Login} />
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Signup} />
-          <PrivateRoute path="/main" component={Main} user={isLogged}/>
-          <PrivateRoute path="/profile" component={UserProfile} user={isLogged} />
-          <PrivateRoute path="/tasks" component={TaskEdit} user={isLogged} />
+          <PrivateRoute path="/main" component={Main} />
+          <PrivateRoute path="/profile" component={UserProfile} />
+          <PrivateRoute path="/tasks" component={TaskEdit} />
       </Switch>
     </Router>
   )
@@ -57,7 +44,8 @@ export const Appcomponent = ({ user }) => {
     componente: componente a ser renderizado
     user: booleano que indica se existe um usuário logado
  */
-const PrivateRoute = ({ component: Component, user, ...rest }) => {
+const PrivateRoute = ({ component: Component, userteste, ...rest }) => {
+  const user = Meteor.userId();
   return(
     <Route
       {...rest}
@@ -93,8 +81,8 @@ const TaskEdit = ({ match }) => {
 }
 
 export const App = withTracker(() =>{
-  const user = Meteor.user();
+  const userId = Meteor.userId();
   
 
-  return {user};
+  return {userId};
 })(Appcomponent)

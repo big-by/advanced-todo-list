@@ -4,7 +4,7 @@ import { ReactiveVar } from 'meteor/reactive-var'
 import { useHistory } from "react-router-dom";
 import { Task } from './Task';
 import { TasksCollection } from '/imports/api/TasksCollection';
-import { useTracker } from 'meteor/react-meteor-data';
+import { useTracker, withTracker } from 'meteor/react-meteor-data';
 import { 
    Button, 
    Typography, 
@@ -30,12 +30,11 @@ import SearchIcon from '@mui/icons-material/Search';
     handlePage: controla a paginação
  */
 
-export const Tasks = () => {
+export const Taskscomponent = ({ filterTasks, page }) => {
    const history = useHistory();
    const user = useTracker(() => Meteor.user());
-   const [filterTasks, setFilter] = useState(false);
    const [searchText, setSearch] = useState('');
-   const [page, setPage] = useState(1);
+   //const [page, setPage] = useState(1);
    //let filterTasks = new ReactiveVar(false);
    
    const addTask = () => {
@@ -51,22 +50,19 @@ export const Tasks = () => {
    }
 
    const handlePage = (event,value) => {
-      setPage(value);
+      page.set(value);
    }
 
-   const filterTasksFunc = () => {
-      return filterTasks.get()
-   }
 
    const {tasks, isLoading, isEmpty} = useTracker(() => {
       const noDataAvailable = { tasks: [], isLoading: false, isEmpty: true};
       const filterText = searchText? {
             $text: { $search: `${searchText}`}
       } : {}
-      const filterSit = filterTasks? {situation: 'Concluída'} : {}
+      const filterSit = filterTasks.get()? {situation: 'Concluída'} : {}
       const filters = {...filterText, ...filterSit };
         
-      const handler = Meteor.subscribe('tasks', filters, page);
+      const handler = Meteor.subscribe('tasks', filters, page.get());
       
       //isLoading: ativa tela de loading
       if (!handler.ready()) {
@@ -100,8 +96,8 @@ export const Tasks = () => {
             <Button
                startIcon={<FilterAltIcon/>} 
                variant="outlined" 
-               onClick={() => { setFilter(!filterTasks) }}>
-                  {filterTasks? 'Todas' : 'Tarefas concluídas'}
+               onClick={() => { filterTasks.set(!filterTasks.get()) }}>
+                  {filterTasks.get()? 'Todas' : 'Tarefas concluídas'}
             </Button>
 
             <TextField
@@ -110,7 +106,7 @@ export const Tasks = () => {
                label="Pesquisa"
                onChange={(e) => {
                   setSearch(e.target.value);
-                  setPage(1);
+                  page.set(1);
                }}
                InputProps={{
                   startAdornment: (
@@ -147,7 +143,7 @@ export const Tasks = () => {
          <Pagination 
             color="primary"
             count={5}
-            page={page}
+            page={page.get()}
             size="small" 
             sx={{justifyContent:'center'}}
             onChange={handlePage}
@@ -156,3 +152,9 @@ export const Tasks = () => {
       </div>
    )
 }
+
+export const Tasks = withTracker(() => {
+   const filterTasks = new ReactiveVar(false)
+   const page = new ReactiveVar(1)
+   return {filterTasks, page}
+})(Taskscomponent)

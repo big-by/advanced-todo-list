@@ -91,10 +91,13 @@ export const UserProfilecomponent = ({ user }) => {
     //Renderiza um esqueleto enquanto as informações do usuário carregam
     if(!user || !user._id){
         return (
+            <div id="main-content">
             <Stack spacing={1} style={{justifyContent:'center', alignItems:"center"}}>
                 <Skeleton variant="circular" width={100} height={100} />
                 <Skeleton variant="rectangular" width="90%" height={400} />
             </Stack>
+            </div>
+
         );
     }
 

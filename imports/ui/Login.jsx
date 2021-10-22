@@ -26,9 +26,8 @@ export const Login = () =>{
 	const [alert, setAlert] = useState({state:false,message:''})
 	const [isLogged, setLogged] = useState(false);
 	const history = useHistory();
-	if(isLogged){
-		
-	}
+	
+	
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		
